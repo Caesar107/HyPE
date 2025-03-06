@@ -164,7 +164,7 @@ python plot.py --all
 
 ## Acknowledgements :pencil:
 
-This project is based on the original [Hybrid Inverse Reinforcement Learning (HYPE)](https://github.com/jren03/hype) implementation. We have significantly modified and extended the codebase to support **a broader range of RL environments (Gym, MuJoCo, Atari)** and introduced **KL divergence & reward-based evaluation** as additional benchmarking metrics.
+This project is based on the original [Hybrid Inverse Reinforcement Learning (HYPE)](https://github.com/jren03/garage) implementation. We have significantly modified and extended the codebase to support **a broader range of RL environments (Gym, MuJoCo, Atari)** and introduced **KL divergence & reward-based evaluation** as additional benchmarking metrics.
 
 The original HyPER algorithm was built on [LAMPS-MBRL](https://github.com/vvanirudh/LAMPS-MBRL/tree/e67085533e64201efef9a3053d9445bbabbddee8), and HyPE was built on [FastIRL](https://github.com/gkswamy98/fast_irl/tree/master). Our modifications focus on extending their applicability and improving performance analysis.
 
