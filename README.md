@@ -177,7 +177,7 @@ Additional components were borrowed from:
 
 ## Citation
 
-If you found this repository useful in your research, plase consider citing our paper.
+If you found this repository useful in your research, plase consider citing paper.
 ```bibtex
 @misc{ren2024hybrid,
       title={Hybrid Inverse Reinforcement Learning}, 
