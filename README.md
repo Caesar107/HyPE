@@ -238,7 +238,7 @@ After these adjustments, the program started successfully with:
 python main.py algorithm=hype overrides=model_free_walker
 ```
 
-and began training without further errors.
+and began training without further errors.（https://github.com/openai/mujoco-py/issues/627）
 
 ***
 [[Top](#hybrid-inverse-reinforcement-learning)]
