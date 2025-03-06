@@ -1,32 +1,16 @@
-<h1 align="center">Hybrid Inverse Reinforcement Learning</h1>
+<h1 align="center">Hybrid Inverse Reinforcement Learning (Modified)</h1>
 <p align="center">
       <img src="https://img.shields.io/badge/python-3.8-blue" />
       <a href= "https://github.com/psf/black">
       <img src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a>
 </p>
 
-This repository contains implementations of the algorithms presented in [Hybrid Inverse Reinforcement Learning](https://arxiv.org/abs/2402.08848). For videos and key insights, please check out our [website](https://gokul.dev/hyper/).
-<p align="center">
-  <img width="500" src="assets/hyper_ffig.png">
-</p>
+This repository is an **extended and modified** version of the original [Hybrid Inverse Reinforcement Learning](https://arxiv.org/abs/2402.08848) implementation. 
 
-This repository implements **hybrid training** in model-free and model-based inverse reinforcement learning. Specifically, we present two novel algorithms: `HyPE` and `HyPER`. At a high level, hybrid training is done by sampling from two buffers, one buffer that contains offline expert demonstrations and one buffer that contains on-policy transitions from the actor during policy updates. This is in contrast to standard inverse RL algorithms, that effectively ignore the expert demonstrations during policy optimization and therefore pay a higher interaction complexity than necessary.
-
-<div class="collage">
-    <div class="column" align="center">
-        <div class="row" align="center">
-            <img src="https://github.com/jren03/garage/blob/main/garage/figures/humanoid_results_iqm.png" alt="Humanoid" width="40%">
-            <img src="https://github.com/jren03/garage/blob/main/garage/figures/walker_results_iqm.png" alt="Walker" width="40%">
-        </div>
-        <div class="row" align="center">
-            <img src="https://github.com/jren03/garage/blob/main/garage/figures/ant_results_iqm.png" alt="Ant" width="40%">
-            <img src="https://github.com/jren03/garage/blob/main/garage/figures/hopper_results_iqm.png" alt="Hopper" width="40%">
-        </div>
-    </div>
-</div>
-
-
-We implement `HyPE` and `HyPER` in practice through [`model_free_irl.py`](garage/algorithms/model_free_irl.py) and [`model_based_irl.py`](garage/algorithms/model_based_irl.py), respectively. More information regarding model-free/model-based inverse reinforcement learning as well as specific implementation details can be found [here](garage/algorithms/README.md).
+### **🔹 Key Improvements**
+- **Extended to support all RL environments**, including Gym, MuJoCo, and Atari.
+- **Added KL divergence and reward-based evaluation** to improve benchmarking across different settings.
+- **Refactored and optimized the codebase** to enhance generalization and ease of use.
 
 ## Table of Contents
 - [Installation](#installation-hammer_and_wrench)
@@ -180,7 +164,16 @@ python plot.py --all
 
 ## Acknowledgements :pencil:
 
-The HyPER algorithm is built off of [LAMPS-MBRL](https://github.com/vvanirudh/LAMPS-MBRL/tree/e67085533e64201efef9a3053d9445bbabbddee8), which is a fork of [mbrl-lib](https://github.com/facebookresearch/mbrl-lib/tree/main). The HyPE algorithm is built off of [FastIRL](https://github.com/gkswamy98/fast_irl/tree/master). We also borrow components from [TD3-BC](https://github.com/sfujim/TD3_BC), [optimistic-adam](https://github.com/georgepar/optimistic-adam/tree/master), [ema-pytorch](https://github.com/lucidrains/ema-pytorch/tree/main), and [StableBaselines3](https://github.com/DLR-RM/stable-baselines3/tree/master).
+This project is based on the original [Hybrid Inverse Reinforcement Learning (HYPE)](https://github.com/jren03/hype) implementation. We have significantly modified and extended the codebase to support **a broader range of RL environments (Gym, MuJoCo, Atari)** and introduced **KL divergence & reward-based evaluation** as additional benchmarking metrics.
+
+The original HyPER algorithm was built on [LAMPS-MBRL](https://github.com/vvanirudh/LAMPS-MBRL/tree/e67085533e64201efef9a3053d9445bbabbddee8), and HyPE was built on [FastIRL](https://github.com/gkswamy98/fast_irl/tree/master). Our modifications focus on extending their applicability and improving performance analysis.
+
+Additional components were borrowed from:
+- [TD3-BC](https://github.com/sfujim/TD3_BC)
+- [optimistic-adam](https://github.com/georgepar/optimistic-adam/tree/master)
+- [ema-pytorch](https://github.com/lucidrains/ema-pytorch/tree/main)
+- [StableBaselines3](https://github.com/DLR-RM/stable-baselines3/tree/master)
+
 
 ## Citation
 
