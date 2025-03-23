@@ -19,21 +19,30 @@ This repository is an **extended and modified** version of the original [Hybrid 
 
 This repository is structured as follows:
 ```
-├── garage                      # Package folder, where we park all our hyrbids
-│   ├── algorithms              # Model free and model based inverse RL implementations
-│   ├── ├── model_based_irl.py  # To run HyPER
-│   ├── ├── model_free_irl.py   # To run HyPE, FILTER, MM, BC-Reg
+├── garage                      # Package folder, where we park all our hybrids
+│   ├── algorithms              # Model-free and model-based inverse RL implementations
+│   │   ├── model_based_irl.py  # To run HyPER
+│   │   ├── model_free_irl.py   # To run HyPE, FILTER, MM, BC-Reg
 │   ├── models                  # Learner and discriminator model architectures
-│   ├── ├── discriminator.py    # Single and ensemble implementation
-│   ├── ├── sac.py              # Used in Mujoco locomotion exps
-│   ├── ├── td3_bc.py           # Used in D4RL antmaze exps
-│   ├── mbrl                    # Fork of mbrl-lib used in model based algorithms
+│   │   ├── discriminator.py    # Single and ensemble implementation
+│   │   ├── sac.py              # Used in Mujoco locomotion experiments
+│   │   ├── td3_bc.py           # Used in D4RL antmaze experiments
+│   ├── mbrl                    # Fork of mbrl-lib used in model-based algorithms
 │   ├── utils                   # Buffers, wrappers, optimizers, and logging
-│   ├── config                  # Hydra config yamls
-│   ├── ├── algorithm           # Algorithm-specific configs
-│   ├── ├── overrides           # Environment-specific configs
-│   ├── figures                 # Comparison plots
+│
+├── config                      # Hydra config yamls
+│   ├── algorithm               # Algorithm-specific configs
+│   ├── overrides               # Environment-specific configs
+│
 ├── experts                     # Training and collecting expert demonstrations
+│
+├── figures                     # Comparison plots
+│
+├── tests                       # Unit tests and utility scripts
+│   ├── utils                   # Utilities for testing data processing
+│   │   ├── convert_demos.py        # Converts expert demos into the required format
+│   │   ├── test_fetch_transitions.py # Unit tests for fetching transitions from datasets
+
 ```
 
 
@@ -65,7 +74,7 @@ For all experiments, please activate the conda environment created in [Installat
 ```
 conda activate hyirl
 ```
-choose 1 or 2 below to get demonstration data
+choose 1 2 or 3 below to get demonstration data
 ### 1.Downloading Original Data
 We provide the original datasets used for the mujoco locomotion environments in the paper. These can be acquired by running
 ```
@@ -88,6 +97,27 @@ python experts/collect_demos.py --env <env_name>
 Demonstrations will be saved as an `.npz` file containing the following entries: `observations`, `actions`, `next_observations`, `rewards`, `terminals`, `timeouts`, `seed`, `qpos`, and `qvel`. 
 
 To extend to more experiments, simply add the new environment to the list of arguments allowed in `experts/train.py`, then run the two scripts above. Policy optimizers for the expert can also be switched out easily, provided the same is done in `experts/collect_demos.py` when loading the checkpoint. 
+
+当然！只给你 **3**，保持和你之前写的风格一致：
+
+---
+
+### 3. Converting Your Own Demonstration Data  
+If you already have your own demonstration dataset (e.g., collected from a different framework or custom environment), you can convert it into the required `.npz` format using our conversion script:  
+```
+python tests/utils/convert_demos.py --input <your_demo_file> --output <converted_demo_file>
+```
+
+The input file should contain your demonstration data in a structured format (e.g., pickle, JSON, or numpy).  
+The conversion script will process the data and output an `.npz` file compatible with the training and evaluation pipelines in this repository.
+
+The resulting `.npz` file will include the following keys:  
+`observations`, `actions`, `next_observations`, `rewards`, `terminals`, `timeouts` (optional), `seed` (optional), `qpos` (optional), and `qvel` (optional).
+
+> [!TIP]  
+> Make sure your input data includes at least `observations`, `actions`, and `rewards`. Additional information such as `next_observations`, `terminals`, and `timeouts` is recommended for compatibility with model-based algorithms.
+
+---
 
 > [!NOTE]
 > This repository currently does not support `gymnasium` versions of environments. We are working on updating our files to support newer versions of `gym` and `gymnasium`. 
