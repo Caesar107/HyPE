@@ -98,9 +98,6 @@ Demonstrations will be saved as an `.npz` file containing the following entries:
 
 To extend to more experiments, simply add the new environment to the list of arguments allowed in `experts/train.py`, then run the two scripts above. Policy optimizers for the expert can also be switched out easily, provided the same is done in `experts/collect_demos.py` when loading the checkpoint. 
 
-当然！只给你 **3**，保持和你之前写的风格一致：
-
----
 
 ### 3. Converting Your Own Demonstration Data  
 If you already have your own demonstration dataset (e.g., collected from a different framework or custom environment), you can convert it into the required `.npz` format using our conversion script:  
