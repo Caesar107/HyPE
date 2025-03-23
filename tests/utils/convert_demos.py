@@ -15,7 +15,7 @@ def convert_walker2d_demos():
     # 设置输入和输出文件路径
     input_file = "/data/home/yche767/Hype/experts/Walker2d-v3/transitions_Walker2d-v3.npy"
     output_dir = "/data/home/yche767/Hype/experts/Walker2d-v3/"
-    output_file = f"{output_dir}Walker2d_demos.npz"
+    output_file = f"{output_dir}Walker2d-v3_demos.npz"
     
     # 确保输出目录存在
     os.makedirs(output_dir, exist_ok=True)
@@ -27,22 +27,22 @@ def convert_walker2d_demos():
     print(f"数据加载成功, 包含 {data.obs.shape[0]} 条转换记录")
     print(f"观察空间维度: {data.obs.shape[1]}")
     
-    # 更清晰的条件分支处理rewards
-    if hasattr(data, 'rewards'):
-        rewards = data.rewards.numpy() if torch.is_tensor(data.rewards) else data.rewards
-    else:
-        rewards = np.zeros_like(data.dones.numpy() if torch.is_tensor(data.dones) else data.dones)
+    # 提取dones数组以便重用
+    dones_np = data.dones.numpy() if torch.is_tensor(data.dones) else data.dones
+    
+    # 全零填充rewards，使用float64类型，IRL算法不依赖于原始reward
+    rewards = np.zeros_like(dones_np, dtype=np.float64)
     
     # 创建符合项目要求的字典结构
     demos_dict = {
         "observations": data.obs.numpy() if torch.is_tensor(data.obs) else data.obs,
         "actions": data.acts.numpy() if torch.is_tensor(data.acts) else data.acts,
         "next_observations": data.next_obs.numpy() if torch.is_tensor(data.next_obs) else data.next_obs,
-        "rewards": rewards,
-        "terminals": data.dones.numpy() if torch.is_tensor(data.dones) else data.dones,
+        "rewards": rewards,  # 使用float64全零rewards，因为IRL不依赖reward信息
+        "terminals": dones_np,
         
-        # 添加timeouts字段
-        "timeouts": np.zeros_like(data.dones.numpy() if torch.is_tensor(data.dones) else data.dones),
+        # 添加timeouts字段，全零填充以避免超时报错
+        "timeouts": np.zeros_like(dones_np),
         
         # 从观察中提取qpos和qvel (假设前8维是qpos，接下来9维是qvel)
         "qpos": (data.obs.numpy() if torch.is_tensor(data.obs) else data.obs)[:, :8],

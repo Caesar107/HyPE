@@ -1,0 +1,63 @@
+import numpy as np
+import os
+
+def test_npz_demos():
+    demo_file = "/data/home/yche767/Hype/experts/Walker2d-v3/Walker2d-v3_demos.npz"
+
+    # 检查文件是否存在
+    if not os.path.exists(demo_file):
+        print(f"❌ 文件不存在: {demo_file}")
+        return
+
+    # 加载 npz 文件
+    print(f"✅ 正在加载: {demo_file}")
+    demos = np.load(demo_file, allow_pickle=True)
+
+    # 必须包含的字段
+    required_keys = [
+        "observations",
+        "actions",
+        "next_observations",
+        "rewards",
+        "terminals",
+        "timeouts",
+        "qpos",
+        "qvel",
+    ]
+
+    # 遍历 key 验证
+    for key in required_keys:
+        if key not in demos:
+            print(f"❌ 缺少字段: {key}")
+            continue
+
+        data = demos[key]
+
+        # 检查数据类型
+        if not isinstance(data, np.ndarray):
+            print(f"❌ {key} 不是 np.ndarray，实际类型: {type(data)}")
+            continue
+        
+        # 检查是否有 object 类型（npz 通病）
+        if data.dtype == np.object_:
+            print(f"❌ {key} 是 object 类型，可能是 list 嵌套，需修正！")
+        else:
+            print(f"✅ {key} 类型和 dtype 正常: {data.dtype}")
+
+        # 输出 shape 信息
+        print(f"  -> shape: {data.shape}")
+
+        # 额外 shape 校验
+        if key == "observations" or key == "next_observations":
+            assert data.shape[1] == 17, f"⚠️ {key} 的第二维不等于 17，当前 shape: {data.shape}"
+        if key == "actions":
+            assert data.shape[1] == 6, f"⚠️ {key} 的第二维不等于 6，当前 shape: {data.shape}"
+        if key == "qpos":
+            assert data.shape[1] == 8, f"⚠️ {key} 的第二维不等于 8，当前 shape: {data.shape}"
+        if key == "qvel":
+            assert data.shape[1] == 9, f"⚠️ {key} 的第二维不等于 9，当前 shape: {data.shape}"
+
+    print("✅ 全部字段检查完毕！没有异常！")
+
+if __name__ == "__main__":
+    test_npz_demos()
