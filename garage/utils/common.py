@@ -56,6 +56,7 @@ ENV_ABBRV_TO_FULL = {
     "hopper": "Hopper-v3",
     "humanoid": "Humanoid-v3",
     "walker": "Walker2d-v3",
+    "cartpole": "CartPole-v1",  # 新增CartPole映射
     "maze-diverse": "antmaze-large-diverse-v2",
     "maze-play": "antmaze-large-play-v2",
 }
