@@ -19,6 +19,7 @@ MF_LOG_FORMAT = [
     ("env_steps", "ES", "int"),
     ("mean_reward", "MR", "float"),
     ("std_reward", "SR", "float"),
+    ("kl_divergence", "KL", "float"),  # 添加KL散度到日志格式
 ]
 MB_LOG_FORMAT = MF_LOG_FORMAT + [
     ("rollout_length", "RL", "int"),

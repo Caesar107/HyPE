@@ -155,6 +155,7 @@ def train(cfg: omegaconf.DictConfig, demos_dict: Dict[str, Any]) -> None:
     disc_steps = 0
     env_steps = 0
     mean_rewards, std_rewards = [], []
+    kl_divs = []  # 添加KL散度历史记录列表
     total_env_steps = cfg.algorithm.total_env_steps
     agent_train_steps = discriminator_cfg.train_every
     expert_sa_pairs = demos_dict["expert_sa_pairs"].to(device)
@@ -207,18 +208,79 @@ def train(cfg: omegaconf.DictConfig, demos_dict: Dict[str, Any]) -> None:
                 )
             mean_rewards.append(mean_reward)
             std_rewards.append(std_reward)
+            
+            # -------- 添加KL散度计算 --------
+            # 收集专家和当前策略的动作分布样本
+            kl_states = expert_sa_pairs[:1000, :env.observation_space.shape[0]].to(device)  # 使用1000个专家状态
+            
+            # 获取专家策略的动作分布参数
+            # 注意：使用专家演示动作作为分布中心，固定方差
+            expert_actions = expert_sa_pairs[:1000, env.observation_space.shape[0]:].to(device)
+            expert_mean = expert_actions
+            expert_std = torch.ones_like(expert_mean) * 0.1  # 假设固定标准差
+            
+            # 获取当前策略的动作分布参数
+            learner_actions = []
+            learner_means = []
+            learner_stds = []
+            
+            # 设置评估模式
+            agent.actor.eval()
+            
+            with torch.no_grad():
+                for state in kl_states:
+                    # 获取策略的动作分布
+                    if hasattr(agent.actor, "get_distribution"):
+                        # 如果actor有获取分布的方法
+                        action_dist = agent.actor.get_distribution(state.unsqueeze(0))
+                        mean = action_dist.mean.squeeze(0)
+                        std = action_dist.stddev.squeeze(0)
+                    else:
+                        # 如果没有，使用predict方法并假设固定方差
+                        action, _ = agent.predict(state.cpu().numpy(), deterministic=False)
+                        action = torch.tensor(action, device=device)
+                        mean = torch.tensor(action, device=device)
+                        std = torch.ones_like(mean) * 0.1
+                    
+                    learner_means.append(mean)
+                    learner_stds.append(std)
+                    learner_actions.append(action)
+            
+            # 恢复训练模式
+            agent.actor.train()
+            
+            # 将列表转换为张量
+            learner_means = torch.stack(learner_means)
+            learner_stds = torch.stack(learner_stds)
+            
+            # 计算KL散度 (从专家到学习者)
+            # KL(p||q) = log(σ2/σ1) + (σ1^2 + (μ1-μ2)^2)/(2σ2^2) - 1/2
+            variance_ratio = (learner_stds / expert_std).pow(2)
+            mean_diff_squared = (expert_mean - learner_means).pow(2)
+            kl_div = (torch.log(variance_ratio) + 
+                      (1/variance_ratio) * (1 + mean_diff_squared/(expert_std.pow(2))) - 1)
+            kl_div = 0.5 * kl_div.sum(dim=1).mean()  # 所有维度和样本的平均KL
+            
+            # 记录KL散度
+            kl_divs.append(kl_div.item())
+            
             logger.log_data(
                 log_name,
                 {
                     "env_steps": env_steps,
                     "mean_reward": mean_reward,
                     "std_reward": std_reward,
+                    "kl_divergence": kl_div.item(),  # 添加KL散度
                 },
             )
+            eval_steps = list(range(cfg.overrides.eval_frequency, env_steps + 1, cfg.overrides.eval_frequency))
+            # 保存结果
             np.savez(
                 str(save_path),
                 means=mean_rewards,
                 stds=std_rewards,
+                kl_divs=kl_divs,  # 添加KL散度历史
+                steps=eval_steps
             )
 
     # ------------- Save results -------------
