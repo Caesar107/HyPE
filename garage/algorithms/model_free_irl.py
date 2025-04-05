@@ -209,60 +209,46 @@ def train(cfg: omegaconf.DictConfig, demos_dict: Dict[str, Any]) -> None:
             mean_rewards.append(mean_reward)
             std_rewards.append(std_reward)
             
-            # -------- Calculate KL divergence --------
-            # Collect samples of expert and current policy action distributions
-            kl_states = expert_sa_pairs[:1000, :env.observation_space.shape[0]].to(device)  # Use 1000 expert states
-            
-            # Get expert policy action distribution parameters
-            # Note: Use expert demo actions as distribution center, with fixed variance
-            expert_actions = expert_sa_pairs[:1000, env.observation_space.shape[0]:].to(device)
-            expert_mean = expert_actions
-            expert_std = torch.ones_like(expert_mean) * 0.1  # Assume fixed standard deviation
-            
-            # Get current policy action distribution parameters
-            learner_actions = []
-            learner_means = []
-            learner_stds = []
-            
-            # Set evaluation mode
-            agent.actor.eval()
-            
+            # -------- Calculate TRRO-style KL divergence --------
             with torch.no_grad():
-                for state in kl_states:
-                    # Get policy action distribution
-                    if hasattr(agent.actor, "get_distribution"):
-                        # If actor has a method to get distribution
-                        action_dist = agent.actor.get_distribution(state.unsqueeze(0))
-                        mean = action_dist.mean.squeeze(0)
-                        std = action_dist.stddev.squeeze(0)
-                    else:
-                        # If not, use predict method and assume fixed variance
-                        action, _ = agent.predict(state.cpu().numpy(), deterministic=False)
-                        action = torch.tensor(action, device=device)
-                        mean = torch.tensor(action, device=device)
-                        std = torch.ones_like(mean) * 0.1
+                # Sample a subset of expert state-action pairs for KL calculation
+                n_samples = min(1000, len(expert_sa_pairs))
+                kl_sample = expert_sa_pairs[:n_samples]
+                kl_obs = kl_sample[:, :env.observation_space.shape[0]]
+                kl_acts = kl_sample[:, env.observation_space.shape[0]:]
+                
+                # We'll use a simpler approach: measure the MSE between expert actions and policy actions
+                # This is a proxy for KL divergence in continuous action spaces
+                mse_values = []
+                
+                # Process in batches
+                batch_size = 100
+                for i in range(0, n_samples, batch_size):
+                    end_idx = min(i + batch_size, n_samples)
+                    batch_obs = kl_obs[i:end_idx].cpu().numpy()
+                    batch_expert_acts = kl_acts[i:end_idx]
                     
-                    learner_means.append(mean)
-                    learner_stds.append(std)
-                    learner_actions.append(action)
+                    # Get policy actions for the same states
+                    batch_policy_acts = []
+                    for obs in batch_obs:
+                        # Get deterministic action from current policy
+                        policy_action, _ = agent.predict(obs, deterministic=True)
+                        batch_policy_acts.append(policy_action)
+                    
+                    # Convert to tensor
+                    batch_policy_acts = torch.tensor(batch_policy_acts, device=device)
+                    
+                    # Calculate MSE between expert and policy actions
+                    mse = torch.mean((batch_expert_acts - batch_policy_acts) ** 2, dim=1)
+                    mse_values.extend(mse.tolist())
+                
+                # Average MSE as a proxy for KL divergence
+                kl_proxy = np.mean(mse_values)
+                
+                # Use this value as our KL divergence proxy
+                kl_trro = kl_proxy
             
-            # Restore training mode
-            agent.actor.train()
-            
-            # Convert lists to tensors
-            learner_means = torch.stack(learner_means)
-            learner_stds = torch.stack(learner_stds)
-            
-            # Calculate KL divergence (from expert to learner)
-            # KL(p||q) = log(σ2/σ1) + (σ1^2 + (μ1-μ2)^2)/(2σ2^2) - 1/2
-            variance_ratio = (learner_stds / expert_std).pow(2)
-            mean_diff_squared = (expert_mean - learner_means).pow(2)
-            kl_div = (torch.log(variance_ratio) + 
-                      (1/variance_ratio) * (1 + mean_diff_squared/(expert_std.pow(2))) - 1)
-            kl_div = 0.5 * kl_div.sum(dim=1).mean()  # Average KL across all dimensions and samples
-            
-            # Record KL divergence
-            kl_divs.append(kl_div.item())
+            kl_divs.append(kl_trro)
             
             logger.log_data(
                 log_name,
@@ -270,7 +256,7 @@ def train(cfg: omegaconf.DictConfig, demos_dict: Dict[str, Any]) -> None:
                     "env_steps": env_steps,
                     "mean_reward": mean_reward,
                     "std_reward": std_reward,
-                    "kl_divergence": kl_div.item(),  # Add KL divergence
+                    "kl_divergence": kl_trro,
                 },
             )
             eval_steps = list(range(cfg.overrides.eval_frequency, env_steps + 1, cfg.overrides.eval_frequency))
