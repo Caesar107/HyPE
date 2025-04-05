@@ -3,8 +3,8 @@ env: "Humanoid-v3"
 
 p_tremble: 0.025
 reset_prob: 0.5
-total_env_steps: 1_000_000
-eval_frequency: 50_000
+total_env_steps: 1_000_00
+eval_frequency: 1_00
 expert_dataset_size: 64_000
 bc_init_steps: 0
 sampling_schedule: [[0.2, 0.1, 200000], [0.1, 0.01, 1000000]]

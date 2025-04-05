@@ -7,8 +7,8 @@ initial_exploration_steps: 1000
 initial_expert_steps: ${overrides.expert_dataset_size}
 
 expert_dataset_size: 64_000
-total_env_steps: 150_000
-eval_frequency: 10_000
+total_env_steps: 100_000
+eval_frequency: 1_000
 epoch_length: 1000
 
 num_elites: 5
