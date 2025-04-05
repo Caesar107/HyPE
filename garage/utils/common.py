@@ -19,7 +19,7 @@ MF_LOG_FORMAT = [
     ("env_steps", "ES", "int"),
     ("mean_reward", "MR", "float"),
     ("std_reward", "SR", "float"),
-    ("kl_divergence", "KL", "float"),  # 添加KL散度到日志格式
+    ("kl_divergence", "KL", "float"),  # Add KL divergence to log format
 ]
 MB_LOG_FORMAT = MF_LOG_FORMAT + [
     ("rollout_length", "RL", "int"),
@@ -57,7 +57,7 @@ ENV_ABBRV_TO_FULL = {
     "hopper": "Hopper-v3",
     "humanoid": "Humanoid-v3",
     "walker": "Walker2d-v3",
-    "cartpole": "CartPole-v1",  # 新增CartPole映射
+    "cartpole": "CartPole-v1",  # Add CartPole mapping
     "maze-diverse": "antmaze-large-diverse-v2",
     "maze-play": "antmaze-large-play-v2",
 }
