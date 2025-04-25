@@ -90,6 +90,9 @@ To train your own experts, please run the following script
 ```
 python experts/train.py --env <env_name>
 ```
+
+e.g. python experts/train.py --env hopper --algo ppo --train_steps 500000
+
 An expert will be trained for the desired environment, and a checkpoint will be saved in `experts/<env_name>`. Then, to use this checkpoint to collect new trajectories, please run the following
 ```
 python experts/collect_demos.py --env <env_name>

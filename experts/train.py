@@ -147,6 +147,7 @@ if __name__ == "__main__":
             verbose=0,
             learning_starts=10_000,
             use_sde=False,
+
         )
         n_train_steps = 1_000_000 if args.train_steps == -1 else args.train_steps
     elif env_name in ["Humanoid-v3"]:
