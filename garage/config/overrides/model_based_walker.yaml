@@ -11,7 +11,7 @@ initial_expert_steps: ${overrides.expert_dataset_size}
 expert_dataset_size: 64_000
 total_env_steps: 150_000
 eval_frequency: 10_000
-epoch_length: 1000
+epoch_length: 100
 
 num_elites: 5
 patience: 10
@@ -39,7 +39,7 @@ discriminator:
   train_every: 10000
   num_sample_trajectories: 4
   num_update_steps: 1
-  batch_size: 4096
+  batch_size: 64
   clip_output: true
   weight_decay: true
   ensemble_size: 7  # 1 is equivalent to no ensemble
