@@ -68,7 +68,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train expert policies.")
     parser.add_argument(
         "--env",
-        choices=["ant", "hopper", "humanoid", "walker", "cartpole"],  # 添加cartpole选项
+        choices=["ant", "hopper", "humanoid", "walker", "cartpole", "halfcheetah"],  # 添加halfcheetah选项
         required=True,
     )
     parser.add_argument(
@@ -139,7 +139,7 @@ if __name__ == "__main__":
             n_steps=128,
         )
         n_train_steps = 1_000_000 if args.train_steps == -1 else args.train_steps
-    elif env_name in ["Ant-v3", "Hopper-v3", "Walker2d-v3"]:
+    elif env_name in ["Ant-v3", "Hopper-v3", "Walker2d-v3", "HalfCheetah-v3"]:
         # 原有SAC配置
         model = SAC(
             "MlpPolicy",

@@ -104,3 +104,14 @@ def ant_maze(act: torch.Tensor, next_obs: torch.Tensor):
     done = ~not_done
     done = done[:, None]
     return done
+
+
+def halfcheetah(act: torch.Tensor, next_obs: torch.Tensor):
+    assert len(next_obs.shape) == 2
+    
+    # HalfCheetah通常没有终止条件，除非观测值包含无穷值
+    not_done = torch.isfinite(next_obs).all(-1)
+    
+    done = ~not_done
+    done = done[:, None]
+    return done

@@ -29,7 +29,7 @@ def get_trajectory_data_dict() -> Dict[str, Any]:
 
 
 def rollout(
-    env_name: str, expert_root_dir: str, max_path: int = 100, num_data: int = 100_000
+    env_name: str, expert_root_dir: str, max_path: int = 1000, num_data: int = 100_000
 ) -> Dict[str, Any]:
     expert_ckpt_path = f"{expert_root_dir}/best_model"
     model = SAC.load(expert_ckpt_path)

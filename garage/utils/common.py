@@ -57,6 +57,7 @@ ENV_ABBRV_TO_FULL = {
     "hopper": "Hopper-v3",
     "humanoid": "Humanoid-v3",
     "walker": "Walker2d-v3",
+    "halfcheetah": "HalfCheetah-v3",  # 添加HalfCheetah映射
     "cartpole": "CartPole-v1",  # Add CartPole mapping
     "maze-diverse": "antmaze-large-diverse-v2",
     "maze-play": "antmaze-large-play-v2",
@@ -67,6 +68,7 @@ ENV_ABBRV_TO_DATASET_URL = {
     "hopper": "https://www.dropbox.com/scl/fi/73ffc8msaky5vc741adr9/Hopper-v3_demos.npz?rlkey=77rm79dd1ppz6mebu0h2w3nvl&dl=1",
     "humanoid": "https://www.dropbox.com/scl/fi/obhdjlbc4pab4v93vflmj/Humanoid-v3_demos.npz?rlkey=tpkz81w8036m1vkzf2556kqsy&dl=1",
     "walker": "https://www.dropbox.com/scl/fi/3i4803t9mz76sqm7k92wy/Walker2d-v3_demos.npz?rlkey=81sb22opy037re044o26bflbh&dl=1",
+    "halfcheetah": "https://www.example.com/HalfCheetah-v3_demos.npz",  # 需要提供实际的URL
 }
 
 
