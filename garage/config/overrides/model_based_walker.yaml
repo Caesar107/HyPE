@@ -8,7 +8,7 @@ bc_init_steps: 0
 initial_exploration_steps: 1000
 initial_expert_steps: ${overrides.expert_dataset_size}
 
-expert_dataset_size: 64_000
+expert_dataset_size: 8_000
 total_env_steps: 150_000
 eval_frequency: 10_000
 epoch_length: 100
